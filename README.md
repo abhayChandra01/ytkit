@@ -4,6 +4,8 @@ Paste a YouTube link (or just the video ID) and download the video in any qualit
 
 YTKit is self-hosted. It needs **no YouTube API key, no Google account and no third-party service**. Everything runs on your own server with open source tools: [yt-dlp](https://github.com/yt-dlp/yt-dlp) reads YouTube's streams and [ffmpeg](https://ffmpeg.org) merges and converts them.
 
+<p align="center"><img src="docs/screenshot-dark.png" alt="YTKit in dark mode showing every quality for a video" width="49%"> <img src="docs/screenshot-light.png" alt="YTKit in light mode" width="49%"></p>
+
 ![stack](https://img.shields.io/badge/stack-FastAPI%20%2B%20yt--dlp%20%2B%20ffmpeg-ff5c8a) ![frontend](https://img.shields.io/badge/frontend-vanilla%20JS%2C%20no%20build-ff8a4c) ![license](https://img.shields.io/badge/keys%20required-none-3ee08f)
 
 ---
@@ -126,7 +128,7 @@ location / {
 }
 ```
 
-When running behind a proxy you control, set `YTKIT_TRUST_PROXY=true` so rate limiting sees real client IPs. (The front end also falls back to polling automatically if a proxy buffers the event stream.)
+The Docker image already starts uvicorn with `--proxy-headers`, so rate limiting sees real client IPs behind Render, Railway, Fly or your own proxy. If you run uvicorn yourself behind a proxy, set `YTKIT_TRUST_PROXY=true` instead. (The front end also falls back to polling automatically if a proxy buffers the event stream.)
 
 ### Keep yt-dlp fresh
 

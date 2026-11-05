@@ -92,3 +92,38 @@ def test_cancel(media_server, tmp_path):
             write_thumbnail=False, merge_format=None, expected_size=None, on_progress=lambda e: None,
             is_cancelled=lambda: True,
         )
+
+
+@pytest.mark.parametrize(
+    "body,suffix",
+    [
+        ({"kind": "video", "quality": 360, "container": "mp4"}, ".mp4"),
+        ({"kind": "video", "quality": 360, "container": "webm"}, None),
+        ({"kind": "audio", "format": "mp3", "bitrate": 192}, ".mp3"),
+        ({"kind": "audio", "format": "original"}, None),
+    ],
+)
+def test_full_api_flow(media_server, monkeypatch, body, suffix):
+    """POST a job through the real API, real yt-dlp and real ffmpeg, then fetch the file."""
+    import time
+
+    from fastapi.testclient import TestClient
+
+    from app import main, parse
+
+    monkeypatch.setattr(parse, "watch_url", lambda vid: media_server)
+    main.job_limiter.hits.clear()
+    with TestClient(main.app) as client:
+        r = client.post("/api/jobs", json={"video_id": "dQw4w9WgXcQ", **body})
+        assert r.status_code == 201, r.text
+        job_id = r.json()["id"]
+        for _ in range(200):
+            data = client.get(f"/api/jobs/{job_id}").json()
+            if data["stage"] in ("done", "error"):
+                break
+            time.sleep(0.1)
+        assert data["stage"] == "done", data
+        if suffix:
+            assert data["filename"].endswith(suffix)
+        f = client.get(data["download_url"])
+        assert f.status_code == 200 and len(f.content) > 1000
