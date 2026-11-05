@@ -87,3 +87,9 @@ def test_normalize_info_shape():
     assert data["thumbnail"].endswith("maxresdefault.jpg")
     assert data["audio"]["source"]["codec"] == "Opus"
     assert data["audio"]["available"]
+
+
+def test_youtube_label_wins_for_widescreen():
+    f = {"height": 800, "width": 1920, "format_note": "1080p60"}
+    assert formats.short_side(f) == 1080
+    assert formats.short_side({"height": 800, "width": 1920}) == 800

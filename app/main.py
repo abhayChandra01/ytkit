@@ -73,7 +73,8 @@ CSP = (
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
     response = await call_next(request)
-    response.headers.setdefault("Content-Security-Policy", CSP)
+    if not request.url.path.startswith(("/api/docs", "/openapi.json")):  # Swagger UI loads from a CDN
+        response.headers.setdefault("Content-Security-Policy", CSP)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "no-referrer")
     response.headers.setdefault("X-Frame-Options", "DENY")

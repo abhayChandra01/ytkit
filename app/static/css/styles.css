@@ -510,6 +510,7 @@ kbd { padding: .05em .45em; border-radius: 6px; border: 1px solid var(--border-s
 .ft-head { font-size: .76rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
 .ft-row span:nth-child(2) { color: var(--text-2); font-size: .95rem; }
 .ft-row span:nth-child(3) { font-weight: 600; font-size: .92rem; text-align: right; font-variant-numeric: tabular-nums; }
+.ft-row.ft-head span { font-size: .76rem; color: var(--text-3); font-weight: 800; }
 .tag { display: inline-block; padding: 3px 10px; border-radius: 8px; font-size: .8rem; letter-spacing: .03em; }
 .tag.v { color: var(--on-accent); background: var(--grad); }
 .tag.a { color: #fff; background: var(--grad-cool); }

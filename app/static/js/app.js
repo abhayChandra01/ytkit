@@ -776,6 +776,10 @@ function hideBrokenImages() {
 
 function init() {
   hideBrokenImages();
+  window.addEventListener('beforeunload', (e) => {
+    const busy = [...jobs.values()].some((j) => !isTerminal(j.data.stage));
+    if (busy) { e.preventDefault(); e.returnValue = ''; }
+  });
   $('#year').textContent = new Date().getFullYear();
   initTheme();
   initHeader();

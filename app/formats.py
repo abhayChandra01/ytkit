@@ -9,6 +9,7 @@ audio stream available.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -143,8 +144,18 @@ def estimate_size(f: dict | None, duration: float | None) -> int | None:
     return None
 
 
+_NOTE_P = re.compile(r"^(\d{3,4})p")
+
+
 def short_side(f: dict) -> int | None:
-    """Quality label in YouTube terms: the shorter side, so a vertical 1080x1920 Short is 1080p."""
+    """Quality label in YouTube terms.
+
+    YouTube's own label ("1080p60") wins, so a 1920x800 widescreen film is still
+    called 1080p. Otherwise use the shorter side, so a vertical 1080x1920 Short is 1080p.
+    """
+    m = _NOTE_P.match(f.get("format_note") or "")
+    if m and f.get("height"):
+        return int(m.group(1))
     h, w = f.get("height"), f.get("width")
     if h and w:
         return int(min(h, w))
