@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+downloads/
+*.part
+.env
+cookies.txt
+.DS_Store

@@ -1,0 +1,19 @@
+services:
+  ytkit:
+    build: .
+    image: ytkit:latest
+    container_name: ytkit
+    ports:
+      - "8000:8000"
+    environment:
+      YTKIT_MAX_CONCURRENT: "3"
+      YTKIT_FILE_TTL: "1800"
+      YTKIT_MAX_DURATION: "14400"
+      # Uncomment if YouTube starts asking the server to sign in (see README):
+      # YTKIT_COOKIES_FILE: /run/secrets/cookies.txt
+      # YTKIT_PROXY: http://user:pass@proxy-host:port
+    # volumes:
+    #   - ./cookies.txt:/run/secrets/cookies.txt:ro
+    tmpfs:
+      - /tmp
+    restart: unless-stopped

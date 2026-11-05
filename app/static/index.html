@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>YTKit · Download YouTube video and audio in any quality</title>
+  <meta name="description" content="Paste a YouTube link and download the video up to 8K or the audio as MP3, WAV, FLAC, M4A and more. No sign-up, no API keys.">
+  <meta name="theme-color" content="#0b0a14" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f7f5fb" media="(prefers-color-scheme: light)">
+  <meta name="color-scheme" content="dark light">
+  <meta property="og:title" content="YTKit · YouTube video and audio downloader">
+  <meta property="og:description" content="Paste a link. Pick 4K, 1080p, MP3, WAV, FLAC and more. Self-hosted, no API keys.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/theme.js"></script>
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Inline icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="g-brand" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ff5c8a"/>
+        <stop offset=".55" stop-color="#ff8a4c"/>
+        <stop offset="1" stop-color="#ffc94d"/>
+      </linearGradient>
+    </defs>
+    <symbol id="i-logo" viewBox="0 0 32 32"><rect x="1" y="5" width="30" height="22" rx="8" fill="url(#g-brand)"/><path d="M13 11.5v9l7.5-4.5z" fill="#14101f"/><path d="M6 31h20" stroke="url(#g-brand)" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="4" rx="1.5"/><path d="M16 5h1.5A2.5 2.5 0 0 1 20 7.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18.5v-11A2.5 2.5 0 0 1 6.5 5H8"/></g></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10.5l5-3v9l-5-3z"/></g></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></g></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-9 9"/></g></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></g></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 4h6v6M20 4l-9 9M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h10"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></g></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l2.1 6.2L20 10l-5.9 1.8L12 18l-2.1-6.2L4 10l5.9-1.8zM19 15l.9 2.6 2.6.9-2.6.9L19 22l-.9-2.6-2.6-.9 2.6-.9z"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></g></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-4.5" stroke-linecap="round"/></g></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M13 2.5L4.5 13.5H12l-1 8 8.5-11H12z"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18.5h2"/></g></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="4" width="17" height="7" rx="2"/><rect x="3.5" y="13" width="17" height="7" rx="2"/><path d="M7.5 7.5h.01M7.5 16.5h.01"/></g></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z"/><circle cx="12" cy="12" r="3"/></g></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></g></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20.5s-7.5-4.6-9.2-9.4C1.7 7.8 3.9 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.7 1.1-1.6 2.7-2.7 4.7-2.7 3.4 0 5.6 3.3 4.5 6.6-1.7 4.8-9.2 9.4-9.2 9.4z"/></symbol>
+  </svg>
+
+  <div class="backdrop" aria-hidden="true">
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+    <div class="grid-overlay"></div>
+    <div class="noise"></div>
+  </div>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="/" aria-label="YTKit home">
+        <svg class="brand-mark" aria-hidden="true"><use href="#i-logo"/></svg>
+        <span class="brand-name">YT<span>Kit</span></span>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="Main">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#formats">Formats</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Toggle theme">
+          <svg class="ico-sun"><use href="#i-sun"/></svg>
+          <svg class="ico-moon"><use href="#i-moon"/></svg>
+        </button>
+        <a class="icon-btn hide-sm" href="https://github.com/abhayChandra01/ytkit" target="_blank" rel="noopener" aria-label="Source code on GitHub" title="Source on GitHub">
+          <svg><use href="#i-github"/></svg>
+        </a>
+        <button class="icon-btn menu-btn" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+          <svg><use href="#i-menu"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero container">
+      <p class="eyebrow reveal"><svg><use href="#i-sparkle"/></svg> No sign-up · No API keys · Up to 8K</p>
+      <h1 class="hero-title reveal">
+        Grab any YouTube video<br>
+        in <span class="grad-text">every quality</span>.
+      </h1>
+      <p class="hero-sub reveal">Paste a link and pick what you want: crisp 4K, 1080p60, or audio as MP3, WAV, FLAC and more. We fetch the best streams and merge them for you.</p>
+
+      <form class="omnibox reveal" id="lookup-form" autocomplete="off" novalidate>
+        <div class="omnibox-glow" aria-hidden="true"></div>
+        <div class="omnibox-inner">
+          <svg class="omnibox-icon" aria-hidden="true"><use href="#i-link"/></svg>
+          <label for="q" class="sr-only">YouTube link or video ID</label>
+          <input id="q" name="q" type="text" inputmode="url" spellcheck="false" autocapitalize="off"
+                 placeholder="Paste a YouTube link or video ID…" aria-describedby="q-hint" enterkeyhint="go">
+          <button class="clear-btn" type="button" id="clear-btn" aria-label="Clear" hidden><svg><use href="#i-x"/></svg></button>
+          <button class="ghost-btn paste-btn" type="button" id="paste-btn"><svg><use href="#i-clipboard"/></svg><span>Paste</span></button>
+          <button class="primary-btn go-btn" type="submit" id="go-btn">
+            <span class="go-label">Fetch</span>
+            <svg><use href="#i-arrow"/></svg>
+            <span class="btn-spinner" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+      <p class="hint reveal" id="q-hint">
+        Works with <code>youtube.com/watch</code>, <code>youtu.be</code>, Shorts, Music and bare IDs. Press <kbd>/</kbd> to focus.
+      </p>
+
+      <div class="recent reveal" id="recent" hidden>
+        <span class="recent-label">Recent</span>
+        <div class="recent-list" id="recent-list"></div>
+      </div>
+    </section>
+
+    <!-- RESULT AREA -->
+    <section class="container stage" id="stage" aria-live="polite">
+      <!-- Loading -->
+      <div class="card loading-card" id="loading" hidden>
+        <div class="loading-visual">
+          <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+        <div class="loading-copy">
+          <p class="loading-title" id="loading-title">Contacting YouTube…</p>
+          <div class="loading-steps" id="loading-steps">
+            <span class="step active">Resolve link</span>
+            <span class="step">Read streams</span>
+            <span class="step">Rank qualities</span>
+          </div>
+        </div>
+        <div class="skeleton">
+          <div class="sk sk-thumb shimmer"></div>
+          <div class="sk-lines">
+            <div class="sk sk-line shimmer" style="width:88%"></div>
+            <div class="sk sk-line shimmer" style="width:62%"></div>
+            <div class="sk sk-line shimmer" style="width:40%"></div>
+            <div class="sk-rows">
+              <div class="sk sk-row shimmer"></div><div class="sk sk-row shimmer"></div><div class="sk sk-row shimmer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="card error-card" id="error" hidden role="alert">
+        <div class="error-icon"><svg><use href="#i-alert"/></svg></div>
+        <div>
+          <p class="error-title">We couldn't fetch that video</p>
+          <p class="error-text" id="error-text"></p>
+        </div>
+        <button class="ghost-btn" type="button" id="retry-btn">Try again</button>
+      </div>
+
+      <!-- Result -->
+      <article class="card result-card" id="result" hidden>
+        <div class="media">
+          <a class="thumb" id="r-thumb-link" href="#" target="_blank" rel="noopener" aria-label="Open on YouTube">
+            <img id="r-thumb" alt="" decoding="async" referrerpolicy="no-referrer">
+            <span class="thumb-play" aria-hidden="true"><svg><use href="#i-external"/></svg></span>
+            <span class="duration" id="r-duration"></span>
+            <span class="short-tag" id="r-short" hidden>Short</span>
+          </a>
+          <div class="meta">
+            <h2 class="r-title" id="r-title"></h2>
+            <p class="r-channel" id="r-channel"></p>
+            <ul class="r-stats">
+              <li><svg><use href="#i-eye"/></svg><span id="r-views"></span></li>
+              <li><svg><use href="#i-calendar"/></svg><span id="r-date"></span></li>
+              <li><svg><use href="#i-clock"/></svg><span id="r-length"></span></li>
+            </ul>
+            <div class="r-actions">
+              <a class="chip-btn" id="r-thumb-dl" href="#" download><svg><use href="#i-image"/></svg>Thumbnail</a>
+              <button class="chip-btn" type="button" id="r-copy"><svg><use href="#i-copy"/></svg>Copy link</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Download type">
+          <span class="tab-indicator" aria-hidden="true"></span>
+          <button role="tab" class="tab" id="tab-video" aria-selected="true" aria-controls="panel-video"><svg><use href="#i-video"/></svg>Video</button>
+          <button role="tab" class="tab" id="tab-audio" aria-selected="false" aria-controls="panel-audio" tabindex="-1"><svg><use href="#i-music"/></svg>Audio only</button>
+        </div>
+
+        <div class="panel" role="tabpanel" id="panel-video" aria-labelledby="tab-video">
+          <div class="panel-head">
+            <div class="seg" id="container-seg" role="radiogroup" aria-label="Video format">
+              <button type="button" role="radio" data-container="mp4" aria-checked="true">MP4</button>
+              <button type="button" role="radio" data-container="webm" aria-checked="false">WebM</button>
+              <button type="button" role="radio" data-container="mkv" aria-checked="false">MKV</button>
+            </div>
+            <p class="panel-note" id="container-note"></p>
+          </div>
+          <ul class="q-list" id="video-list"></ul>
+        </div>
+
+        <div class="panel" role="tabpanel" id="panel-audio" aria-labelledby="tab-audio" hidden>
+          <div class="audio-grid" id="audio-grid" role="radiogroup" aria-label="Audio format"></div>
+          <div class="audio-bottom">
+            <div class="bitrate-wrap">
+              <span class="field-label">Quality</span>
+              <div class="seg" id="bitrate-seg" role="radiogroup" aria-label="Bitrate"></div>
+            </div>
+            <div class="audio-cta">
+              <div class="audio-est"><span class="field-label">Estimated size</span><strong id="audio-size">–</strong></div>
+              <button class="primary-btn big" type="button" id="audio-dl"><svg><use href="#i-download"/></svg><span>Download MP3</span></button>
+            </div>
+          </div>
+          <p class="panel-note" id="audio-source"></p>
+        </div>
+      </article>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="container section" id="features">
+      <div class="section-head reveal">
+        <p class="kicker">Why YTKit</p>
+        <h2>Everything you need, nothing you don't</h2>
+      </div>
+      <div class="features">
+        <article class="feature spot reveal"><div class="f-ico"><svg><use href="#i-sparkle"/></svg></div><h3>Maximum quality</h3><p>We read every stream YouTube offers, take the best video for your resolution plus the best audio, and merge them losslessly.</p></article>
+        <article class="feature spot reveal"><div class="f-ico"><svg><use href="#i-layers"/></svg></div><h3>Every format</h3><p>MP4, WebM and MKV for video. MP3, M4A, Opus, OGG, WAV and FLAC for audio, with cover art and tags.</p></article>
+        <article class="feature spot reveal"><div class="f-ico"><svg><use href="#i-shield"/></svg></div><h3>No keys, no accounts</h3><p>No YouTube API key, no sign-up and no trackers. Files are deleted from the server shortly after you save them.</p></article>
+        <article class="feature spot reveal"><div class="f-ico"><svg><use href="#i-bolt"/></svg></div><h3>Live progress</h3><p>Watch the download, merge and conversion happen in real time, with speed and time left.</p></article>
+        <article class="feature spot reveal"><div class="f-ico"><svg><use href="#i-phone"/></svg></div><h3>Shorts and Music</h3><p>Shorts, YouTube Music, embeds and share links all work. Paste messy text and we'll find the link.</p></article>
+        <article class="feature spot reveal"><div class="f-ico"><svg><use href="#i-server"/></svg></div><h3>Self-hosted</h3><p>Runs anywhere Docker runs. Your server, your rules, powered by open source yt-dlp and ffmpeg.</p></article>
+      </div>
+    </section>
+
+    <!-- HOW -->
+    <section class="container section" id="how">
+      <div class="section-head reveal">
+        <p class="kicker">How it works</p>
+        <h2>Three steps. About ten seconds.</h2>
+      </div>
+      <ol class="steps">
+        <li class="step-card reveal"><span class="step-num">1</span><h3>Paste</h3><p>Drop in a link, a share URL or just the 11-character video ID.</p></li>
+        <li class="step-card reveal"><span class="step-num">2</span><h3>Pick</h3><p>Choose a resolution and container, or switch to audio and pick a format and bitrate.</p></li>
+        <li class="step-card reveal"><span class="step-num">3</span><h3>Save</h3><p>We download, merge and convert on the server, then your browser saves the finished file.</p></li>
+      </ol>
+    </section>
+
+    <!-- FORMATS -->
+    <section class="container section" id="formats">
+      <div class="section-head reveal">
+        <p class="kicker">Formats</p>
+        <h2>Pick the right file for the job</h2>
+      </div>
+      <div class="format-table reveal" role="table" aria-label="Supported formats">
+        <div class="ft-row ft-head" role="row"><span role="columnheader">Format</span><span role="columnheader">Best for</span><span role="columnheader">Quality</span></div>
+        <div class="ft-row" role="row"><span role="cell"><b class="tag v">MP4</b></span><span role="cell">Phones, TVs, editors. H.264 up to 1080p, VP9/AV1 above.</span><span role="cell">Up to 8K</span></div>
+        <div class="ft-row" role="row"><span role="cell"><b class="tag v">WebM</b></span><span role="cell">Browsers and web projects. VP9 or AV1 with Opus.</span><span role="cell">Up to 8K</span></div>
+        <div class="ft-row" role="row"><span role="cell"><b class="tag v">MKV</b></span><span role="cell">Archiving. The absolute best streams, HDR included.</span><span role="cell">Up to 8K HDR</span></div>
+        <div class="ft-row" role="row"><span role="cell"><b class="tag a">MP3</b></span><span role="cell">Any player, car stereos, everything.</span><span role="cell">128–320 kbps</span></div>
+        <div class="ft-row" role="row"><span role="cell"><b class="tag a">M4A</b></span><span role="cell">Apple Music, iPhone, iTunes.</span><span role="cell">128–256 kbps</span></div>
+        <div class="ft-row" role="row"><span role="cell"><b class="tag a">OPUS / OGG</b></span><span role="cell">Small files, great quality, open formats.</span><span role="cell">96–320 kbps</span></div>
+        <div class="ft-row" role="row"><span role="cell"><b class="tag a">WAV / FLAC</b></span><span role="cell">Editing, DJ software, sampling.</span><span role="cell">Lossless container</span></div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="container section narrow" id="faq">
+      <div class="section-head reveal">
+        <p class="kicker">FAQ</p>
+        <h2>Good questions</h2>
+      </div>
+      <div class="faq">
+        <details class="reveal"><summary>Why does 1080p and above take a little longer?<svg><use href="#i-chevron"/></svg></summary><div><p>YouTube stores high resolutions as separate video and audio streams. We download both at full quality and merge them with ffmpeg, which takes a few extra seconds but keeps every pixel.</p></div></details>
+        <details class="reveal"><summary>Is 320 kbps MP3 better than the original?<svg><use href="#i-chevron"/></svg></summary><div><p>No conversion can add detail that isn't in the source. YouTube's best audio is usually Opus at around 130–160 kbps. 320 kbps MP3 keeps as much of it as possible, and WAV or FLAC keep it without any further loss. Pick <em>Original</em> for the untouched stream.</p></div></details>
+        <details class="reveal"><summary>Which video format should I choose?<svg><use href="#i-chevron"/></svg></summary><div><p>MP4 plays everywhere. MKV gives the absolute best streams, including HDR, and is great for archiving. WebM is ideal for the web.</p></div></details>
+        <details class="reveal"><summary>Do you keep my files?<svg><use href="#i-chevron"/></svg></summary><div><p>Files live on the server only long enough for you to save them, then they're deleted automatically. Your recent lookups are stored only in your own browser.</p></div></details>
+        <details class="reveal"><summary>Can I download playlists or live streams?<svg><use href="#i-chevron"/></svg></summary><div><p>Not yet. Paste a single video. Live streams can be downloaded once they've ended.</p></div></details>
+        <details class="reveal"><summary>Is this legal?<svg><use href="#i-chevron"/></svg></summary><div><p>Download only content you own or have permission to use, and respect creators' rights and YouTube's Terms of Service. YTKit isn't affiliated with YouTube or Google.</p></div></details>
+      </div>
+    </section>
+  </main>
+
+  <!-- DOWNLOAD DOCK -->
+  <aside class="dock" id="dock" aria-label="Downloads" hidden>
+    <button class="dock-head" type="button" id="dock-toggle" aria-expanded="true">
+      <span class="dock-title"><svg><use href="#i-download"/></svg>Downloads <span class="dock-count" id="dock-count">0</span></span>
+      <svg class="dock-chev"><use href="#i-chevron"/></svg>
+    </button>
+    <ul class="dock-list" id="dock-list"></ul>
+  </aside>
+
+  <div class="toasts" id="toasts" aria-live="assertive"></div>
+
+  <footer class="site-footer">
+    <div class="footer-glow" aria-hidden="true"></div>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/" aria-label="YTKit home">
+          <svg class="brand-mark" aria-hidden="true"><use href="#i-logo"/></svg>
+          <span class="brand-name">YT<span>Kit</span></span>
+        </a>
+        <p>The fast, clean way to save YouTube video and audio in the quality you want. Self-hosted and open source.</p>
+        <p class="status" id="status"><span class="dot"></span><span id="status-text">Checking server…</span></p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#formats">Formats</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h4>Downloads</h4>
+        <a href="#top" data-focus-input>Video to MP4</a>
+        <a href="#top" data-focus-input>YouTube to MP3</a>
+        <a href="#top" data-focus-input>YouTube to WAV</a>
+        <a href="#top" data-focus-input>Shorts downloader</a>
+      </div>
+      <div class="footer-col">
+        <h4>Project</h4>
+        <a href="https://github.com/abhayChandra01/ytkit" target="_blank" rel="noopener">GitHub</a>
+        <a href="/api/docs" target="_blank" rel="noopener">API docs</a>
+        <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener">Powered by yt-dlp</a>
+        <a href="https://ffmpeg.org" target="_blank" rel="noopener">and ffmpeg</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© <span id="year">2026</span> YTKit. Made with <svg class="heart"><use href="#i-heart"/></svg> for people who like good files.</p>
+      <p class="disclaimer">Not affiliated with YouTube or Google. Only download content you have the right to use.</p>
+    </div>
+  </footer>
+</body>
+</html>

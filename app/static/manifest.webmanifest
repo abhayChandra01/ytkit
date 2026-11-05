@@ -1,0 +1,10 @@
+{
+  "name": "YTKit",
+  "short_name": "YTKit",
+  "description": "Download YouTube video and audio in any quality.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0a14",
+  "theme_color": "#0b0a14",
+  "icons": [{ "src": "/img/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
