@@ -18,6 +18,7 @@ from .config import settings
 log = logging.getLogger("ytkit.jobs")
 
 TERMINAL = {"done", "error", "cancelled"}
+MARKER = ".ytkit-job"
 
 
 @dataclass
@@ -140,6 +141,8 @@ class JobManager:
             return
         self._update(job, stage="preparing", message="Fetching stream details", percent=0.0)
         out_dir = self._job_dir(job)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / MARKER).touch()
         try:
             info = ytdl.fetch_info(url)
             spec, sort, expected = formats.format_selector(info, kind, quality, container, audio_format)
@@ -184,6 +187,8 @@ class JobManager:
                     raise
                 log.info("Retrying job %s without cover art after: %s", job.id, first)
                 shutil.rmtree(out_dir, ignore_errors=True)
+                out_dir.mkdir(parents=True, exist_ok=True)
+                (out_dir / MARKER).touch()
                 pps = [p for p in pps if p["key"] not in ("EmbedThumbnail", "FFmpegThumbnailsConvertor")]
                 path = ytdl.download(
                     url,
@@ -228,9 +233,9 @@ class JobManager:
             shutil.rmtree(out_dir, ignore_errors=True)
 
     def _purge_orphans(self) -> None:
-        """Delete leftovers from a previous run of the server."""
+        """Delete leftovers from a previous run. Only folders YTKit created (marked) are touched."""
         for child in settings.download_dir.iterdir():
-            if child.is_dir():
+            if child.is_dir() and (child / MARKER).exists():
                 shutil.rmtree(child, ignore_errors=True)
 
     def _cleanup_loop(self) -> None:

@@ -277,7 +277,7 @@ def download(
     return _find_output(info, out_dir)
 
 
-_TEMP_SUFFIXES = (".part", ".ytdl", ".temp", ".jpg", ".webp", ".png")
+_TEMP_SUFFIXES = (".part", ".ytdl", ".temp", ".jpg", ".webp", ".png", ".ytkit-job")
 
 
 def _find_output(info: dict | None, out_dir: Path) -> Path:
