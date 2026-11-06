@@ -6,12 +6,14 @@ import logging
 import re
 import threading
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Callable
 
 import yt_dlp
 from yt_dlp.utils import DownloadError, ExtractorError
 
+from . import cookies
 from .config import settings
 
 log = logging.getLogger("ytkit.ytdl")
@@ -41,10 +43,10 @@ def _friendly(raw: str) -> FetchError:
     if "private video" in msg:
         return FetchError("This video is private.", 403)
     if "sign in to confirm your age" in msg or "age-restricted" in msg or "inappropriate for some users" in msg:
-        return FetchError("This video is age-restricted. The server needs a cookies file to fetch it (see README).", 403)
+        return FetchError("This video is age-restricted. The server needs YouTube cookies to fetch it (see README).", 403)
     if "sign in to confirm you" in msg and "bot" in msg:
         return FetchError(
-            "YouTube is asking this server to prove it's not a bot. Add a cookies file or a proxy (see README).",
+            "YouTube is asking this server to prove it's not a bot. Add YouTube cookies or a proxy (see README).",
             503,
         )
     if "members-only" in msg or "join this channel" in msg:
@@ -78,11 +80,19 @@ def base_options() -> dict[str, Any]:
         # Whichever of these is installed will be used.
         "js_runtimes": {"deno": {}, "node": {}, "bun": {}},
     }
-    if settings.cookies_file:
-        opts["cookiefile"] = settings.cookies_file
     if settings.proxy:
         opts["proxy"] = settings.proxy
     return opts
+
+
+@contextmanager
+def _ydl(opts: dict[str, Any]):
+    """A YoutubeDL instance with its own copy of the cookies, if any are configured."""
+    with cookies.cookie_file() as path:
+        if path:
+            opts = opts | {"cookiefile": path}
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            yield ydl
 
 
 class _QuietLogger:
@@ -148,7 +158,7 @@ def fetch_info(url: str, *, use_cache: bool = True) -> dict:
 
     try:
         opts = base_options() | {"skip_download": True}
-        with yt_dlp.YoutubeDL(opts) as ydl:
+        with _ydl(opts) as ydl:
             info = ydl.extract_info(url, download=False)
         if not info:
             raise FetchError("YouTube returned no data for this video.", 502)
@@ -267,7 +277,7 @@ def download(
         opts["merge_output_format"] = merge_format
 
     try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
+        with _ydl(opts) as ydl:
             info = ydl.extract_info(url, download=True)
     except (DownloadError, ExtractorError) as e:
         if is_cancelled():

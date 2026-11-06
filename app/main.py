@@ -23,7 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from . import __version__, formats, parse, ytdl
+from . import __version__, cookies, formats, parse, ytdl
 from .config import settings
 from .jobs import TERMINAL, JobManager
 
@@ -142,6 +142,7 @@ def health():
         "yt_dlp": yt_dlp.version.__version__,
         "ffmpeg": bool(shutil.which("ffmpeg")),
         "js_runtime": _js_runtime(),
+        "cookies": cookies.configured(),
         "active_jobs": manager.active_count() if manager else 0,
     }
 

@@ -159,14 +159,18 @@ Everything is optional. Set these as environment variables.
 | `YTKIT_TRUST_PROXY` | `false` | Use `X-Forwarded-For` for client IPs (only behind your own proxy). |
 | `YTKIT_DOWNLOAD_DIR` | system temp `/ytkit` | Where temporary files go. |
 | `YTKIT_EMBED_METADATA` | `true` | Embed title, artist and cover art in audio files. |
-| `YTKIT_COOKIES_FILE` | none | Path to a Netscape `cookies.txt`. See below. |
+| `YTKIT_COOKIES` | none | The **contents** of a Netscape `cookies.txt` (raw text or base64). Best for Vercel and other hosts without file uploads. See below. |
+| `YTKIT_COOKIES_FILE` | none | Path to a Netscape `cookies.txt`, for hosts that can mount files. |
 | `YTKIT_PROXY` | none | Outbound proxy for YouTube traffic, e.g. `http://user:pass@host:port` or `socks5://host:port`. |
 
 ### If YouTube says "Sign in to confirm you're not a bot"
 
 YouTube is stricter with traffic from cloud/datacenter IP ranges than with home connections. Running YTKit on your own computer or a home server almost never hits this. On a cloud host you may see it eventually. Options, from simplest:
 
-1. **Cookies.** Log in to YouTube in a private browser window, export cookies with an extension such as *Get cookies.txt LOCALLY*, close that window, and mount the file:
+1. **Cookies.** Log in to YouTube in a private browser window, export cookies with an extension such as *Get cookies.txt LOCALLY* (Netscape format), and close that window.
+   - **Vercel, Railway, Fly or anything with env vars:** open the exported `.txt`, copy everything, and paste it as the value of `YTKIT_COOKIES`. Then redeploy. Pasting a base64 version also works (`base64 -i cookies.txt`).
+   - **Render:** add the file under Environment → Secret Files, then set `YTKIT_COOKIES_FILE=/etc/secrets/cookies.txt`.
+   - **Docker Compose:** mount the file:
    ```yaml
    # docker-compose.yml
    environment:
@@ -174,7 +178,7 @@ YouTube is stricter with traffic from cloud/datacenter IP ranges than with home 
    volumes:
      - ./cookies.txt:/run/secrets/cookies.txt:ro
    ```
-   Use a throwaway Google account for this, not your main one.
+   Use a throwaway Google account for this, not your main one. Treat the cookies like a password and never commit them. `/api/health` reports `"cookies": true` once they're loaded. They last weeks to months; when the bot message returns, export fresh ones.
 2. **A residential proxy.** Set `YTKIT_PROXY`. Any HTTP or SOCKS5 proxy works. This is the only place a paid "key" might come in, and it's optional.
 3. **PO token provider.** For heavy use, the community [bgutil-ytdlp-pot-provider](https://github.com/Brainicism/bgutil-ytdlp-pot-provider) plugin can run as a sidecar and generate the tokens YouTube asks for. Install the plugin with pip in the image and run its server next to YTKit.
 
