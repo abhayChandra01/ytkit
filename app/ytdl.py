@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 import threading
 import time
@@ -65,7 +66,21 @@ def _friendly(raw: str) -> FetchError:
     return FetchError("Something went wrong while talking to YouTube. Please try again.", 502)
 
 
-def base_options() -> dict[str, Any]:
+# Player clients to fall back to when YouTube answers the default ones with a bot
+# check. Different clients are challenged differently, so one often still works.
+FALLBACK_CLIENTS = ["mweb,tv,web_safari", "tv_simply,web_embedded,android_vr"]
+_ENV_CLIENTS = os.getenv("YTKIT_PLAYER_CLIENTS", "").strip() or None
+_working_clients: str | None = _ENV_CLIENTS  # last client set that got past YouTube
+
+
+def is_bot_check(raw: str) -> bool:
+    msg = raw.lower()
+    return ("confirm you" in msg and "bot" in msg) or "login_required" in msg or "po token" in msg
+
+
+def base_options(clients: str | None = "auto") -> dict[str, Any]:
+    if clients == "auto":
+        clients = _working_clients
     opts: dict[str, Any] = {
         "quiet": True,
         "no_warnings": True,
@@ -82,6 +97,8 @@ def base_options() -> dict[str, Any]:
     }
     if settings.proxy:
         opts["proxy"] = settings.proxy
+    if clients:
+        opts["extractor_args"] = {"youtube": {"player_client": clients.split(",")}}
     return opts
 
 
@@ -157,9 +174,7 @@ def fetch_info(url: str, *, use_cache: bool = True) -> dict:
             return cached
 
     try:
-        opts = base_options() | {"skip_download": True}
-        with _ydl(opts) as ydl:
-            info = ydl.extract_info(url, download=False)
+        info, ydl = _extract_with_fallback(url)
         if not info:
             raise FetchError("YouTube returned no data for this video.", 502)
         if info.get("_type") == "playlist":
@@ -178,6 +193,31 @@ def fetch_info(url: str, *, use_cache: bool = True) -> dict:
             ev = _inflight.pop(url, None)
         if ev is not None:
             ev.set()
+
+
+def _extract_with_fallback(url: str):
+    """Extract metadata, trying other player clients if YouTube asks for a bot check."""
+    global _working_clients
+    attempts: list[str | None] = [_working_clients]
+    if not _ENV_CLIENTS:
+        attempts += [c for c in [None, *FALLBACK_CLIENTS] if c not in attempts]
+    last: Exception | None = None
+    for clients in attempts:
+        opts = base_options(clients) | {"skip_download": True}
+        try:
+            with _ydl(opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+            if clients != _working_clients:
+                log.info("YouTube player clients %r worked; using them from now on", clients or "default")
+                _working_clients = clients
+            return info, ydl
+        except (DownloadError, ExtractorError) as e:
+            raw = _ANSI.sub("", str(e))
+            log.warning("yt-dlp failed with player clients %r: %s", clients or "default", raw[:500])
+            last = e
+            if not is_bot_check(raw):
+                raise
+    raise last  # every client set hit the bot check
 
 
 # ---------------------------------------------------------------------------

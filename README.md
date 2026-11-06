@@ -161,6 +161,8 @@ Everything is optional. Set these as environment variables.
 | `YTKIT_EMBED_METADATA` | `true` | Embed title, artist and cover art in audio files. |
 | `YTKIT_COOKIES` | none | The **contents** of a Netscape `cookies.txt` (raw text or base64). Best for Vercel and other hosts without file uploads. See below. |
 | `YTKIT_COOKIES_FILE` | none | Path to a Netscape `cookies.txt`, for hosts that can mount files. |
+| `YTKIT_PLAYER_CLIENTS` | auto | Comma-separated yt-dlp YouTube clients to use, e.g. `tv,mweb`. Default: yt-dlp's choice, with automatic fallbacks on bot checks. |
+| `YTKIT_POT_PROVIDER` | `true` | Start the bundled PO token server (Docker image only). |
 | `YTKIT_PROXY` | none | Outbound proxy for YouTube traffic, e.g. `http://user:pass@host:port` or `socks5://host:port`. |
 
 ### If YouTube says "Sign in to confirm you're not a bot"
@@ -180,7 +182,8 @@ YouTube is stricter with traffic from cloud/datacenter IP ranges than with home 
    ```
    Use a throwaway Google account for this, not your main one. Treat the cookies like a password and never commit them. `/api/health` reports `"cookies": true` once they're loaded. They last weeks to months; when the bot message returns, export fresh ones.
 2. **A residential proxy.** Set `YTKIT_PROXY`. Any HTTP or SOCKS5 proxy works. This is the only place a paid "key" might come in, and it's optional.
-3. **PO token provider.** For heavy use, the community [bgutil-ytdlp-pot-provider](https://github.com/Brainicism/bgutil-ytdlp-pot-provider) plugin can run as a sidecar and generate the tokens YouTube asks for. Install the plugin with pip in the image and run its server next to YTKit.
+3. **PO tokens (built in, free).** The Docker image ships the [bgutil PO token server](https://github.com/Brainicism/bgutil-ytdlp-pot-provider) and starts it automatically on `127.0.0.1:4416`; the yt-dlp plugin uses it whenever YouTube asks for a token. `/api/health` shows `"po_token_server": true` when it's running. Set `YTKIT_POT_PROVIDER=false` to turn it off.
+4. **Player client fallback (automatic).** If YouTube bot-checks the default clients, YTKit retries with other YouTube clients (`mweb,tv,web_safari`, then `tv_simply,web_embedded,android_vr`) and remembers the one that worked. To pin your own, set `YTKIT_PLAYER_CLIENTS`, e.g. `tv,mweb`.
 
 Cookies also unlock age-restricted videos.
 

@@ -1,9 +1,14 @@
 # syntax=docker/dockerfile:1
+# PO token server (bgutil). YouTube asks flagged servers for these tokens; the
+# app starts this server on 127.0.0.1:4416 and the yt-dlp plugin talks to it.
+FROM brainicism/bgutil-ytdlp-pot-provider:2.0.2-deno AS bgutil
+
 FROM python:3.12-slim
 
 # ffmpeg merges and converts streams; Deno is the JavaScript runtime yt-dlp uses
-# to solve YouTube's player challenges.
-COPY --from=denoland/deno:bin-2.5.6 /deno /usr/local/bin/deno
+# to solve YouTube's player challenges, and it also runs the PO token server.
+COPY --from=denoland/deno:bin-2.9.5 /deno /usr/local/bin/deno
+COPY --from=bgutil /app /opt/bgutil
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini \
  && rm -rf /var/lib/apt/lists/*
@@ -12,6 +17,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     YTKIT_DOWNLOAD_DIR=/data/downloads \
+    DENO_DIR=/opt/bgutil/.cache/deno \
+    DENO_NO_PROMPT=1 \
+    DENO_NO_UPDATE_CHECK=1 \
     PORT=8000
 
 WORKDIR /app

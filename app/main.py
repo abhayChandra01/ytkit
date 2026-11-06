@@ -23,7 +23,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from . import __version__, cookies, formats, parse, ytdl
+from . import __version__, cookies, formats, parse, pot, ytdl
 from .config import settings
 from .jobs import TERMINAL, JobManager
 
@@ -41,6 +41,7 @@ manager: JobManager | None = None
 async def lifespan(app: FastAPI):
     global manager
     manager = JobManager()
+    await run_in_threadpool(pot.server.start)
     log.info(
         "YTKit %s ready (yt-dlp %s, ffmpeg %s, js runtime %s)",
         __version__,
@@ -50,6 +51,7 @@ async def lifespan(app: FastAPI):
     )
     yield
     manager.shutdown()
+    pot.server.stop()
 
 
 app = FastAPI(title="YTKit", version=__version__, lifespan=lifespan, docs_url="/api/docs", redoc_url=None)
@@ -143,6 +145,7 @@ def health():
         "ffmpeg": bool(shutil.which("ffmpeg")),
         "js_runtime": _js_runtime(),
         "cookies": cookies.configured(),
+        "po_token_server": pot.server.healthy(),
         "active_jobs": manager.active_count() if manager else 0,
     }
 
